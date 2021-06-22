@@ -1,4 +1,8 @@
+require('dotenv').config()
 require("@nomiclabs/hardhat-truffle5");
+require("@nomiclabs/hardhat-ethers");
+// require('@nomiclabs/hardhat-waffle');
+// require('@nomiclabs/hardhat-etherscan');
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -18,6 +22,11 @@ module.exports = {
         auto: false,
         interval: 5000
       }
+    },
+    dev: {
+      url: 'http://127.0.0.1:9933',
+      chainId: 1281,
+      accounts: [process.env.PRI1, process.env.PRI2, process.env.PRI3, process.env.PRI4, process.env.PRI5, process.env.PRI6]
     }
   },
   paths: {

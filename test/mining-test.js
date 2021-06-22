@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const hre = require('hardhat');
+const ethers = hre.ethers;
 
 
 const HzlToken = artifacts.require("HzlToken");

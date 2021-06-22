@@ -1,0 +1,22 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+pragma solidity ^0.8.0;
+
+contract HZLLogger {
+    event LogEvent(
+        address indexed contractAddress,
+        address indexed caller,
+        string indexed logName,
+        bytes data
+    );
+
+    // solhint-disable-next-line func-name-mixedcase
+    function Log(
+        address _contract,
+        address _caller,
+        string memory _logName,
+        bytes memory _data
+    ) public {
+        emit LogEvent(_contract, _caller, _logName, _data);
+    }
+}

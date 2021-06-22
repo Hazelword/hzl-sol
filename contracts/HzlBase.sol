@@ -4,21 +4,6 @@ pragma solidity ^0.8.0;
 
 contract HzlBase {
 
-    struct MiningConfig {
-
-        //the pledge hzl token for staking
-        uint256 pledgeUnit;
-
-        //the fee for mining
-        uint256 feeUnit;
-
-        //the reward by per block
-        uint256 minnerReward;
-
-        //the block mining time of base chain block number
-        uint32 miningRange;
-    }
-
     struct PriceSheet {
         // index of price sheet
         uint256 index;
@@ -68,16 +53,13 @@ contract HzlBase {
     }
 
 
-    bytes32 USDT_TOKEN = "usdt";
+    bytes32 USDT_TOKEN = keccak256('usdt');
 
-    bytes32 HZL_TOKEN = "hzl";
+    bytes32 HZL_TOKEN = keccak256('hzl');
 
+    bytes32 HZL_REGISTRY = keccak256('HZLRegistry');
 
-    //eg. usdt=>address, hzl=>address
-    mapping(bytes32 => address) tokenPair;
-
-    //quote trading pair, ture is Hazelword offered
-    mapping(address => bool) _quotePair;
+    bytes32 HZL_CONFIG = keccak256('HZLConfig');
 
     //price sheet, token address => quote
     mapping(address => PriceSheet[]) _priceSheets;
@@ -88,20 +70,11 @@ contract HzlBase {
     //price chain, block number => price market
     mapping(uint256 => HzlBlock) _hzlChain;
 
-    //is minner?, user address => bool
-    mapping(address => bool) minners;
-
     // the precision of price,(e.g 1000, means four decimal places)
     mapping(address => uint32) _precisions;
 
     PriceMarket currentPriceMarket;
 
-    MiningConfig miningConfig;
-
     BlockInfo blockInfo;
-
-    function getTokenAddress(bytes32 name) public view returns (address){
-        return tokenPair[name];
-    }
 
 }
