@@ -10,8 +10,8 @@ abstract contract IHZLRegistry {
     function getAddr(bytes32 _id) public view virtual returns (address);
 
     /// @notice Helper function to easily query if id is registered
-    /// @param _id Id of contract
-    function isRegistered(bytes32 _id) public view virtual returns (bool);
+    /// @param _addr address of contract
+    function isRegistered(address _addr) public view virtual returns (bool);
 
     /////////////////////////// OWNER ONLY FUNCTIONS ///////////////////////////
 

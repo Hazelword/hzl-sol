@@ -64,28 +64,27 @@ contract HzlNode is AdminAuth, Lock{
         flag = NO_ACTIVE;
     }
 
-    function stake(bytes32 _id, uint256 amount)
+    function stake(address tokenAddress, uint256 amount)
         external 
         lock 
         onlyOneBlock
         whenActive
     {
         require(amount > 0, "Hzl:stake:!amount");
-        address tokenAddress = hzlRegisty.getAddr(_id);
-        require(hzlRegisty.isRegistered(_id), "Hzl:stake:!amount");
+        require(hzlRegisty.isRegistered(tokenAddress), "Hzl:stake:!amount");
         _token_staked_total[tokenAddress] = _token_staked_total[tokenAddress].add(amount);
         _staked_balances[tokenAddress][msg.sender] = _staked_balances[tokenAddress][msg.sender].add(amount);
         _safeTransfer(tokenAddress, address(this), amount);
     }
 
-    function query(bytes32 _id) 
+    function query(address tokenAddress) 
         public
         view
         whenActive
         returns (uint256)
     {
         HzlMining hzlMining = HzlMining(_hzlMining);
-        uint256 price = hzlMining.queryCurrent(_id);
+        uint256 price = hzlMining.queryCurrent(tokenAddress);
         return price;
     }
     

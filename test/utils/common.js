@@ -1,8 +1,6 @@
 const hre = require('hardhat');
 const fs = require('fs');
 
-const { deployAsOwner } = require('../scripts/utils/deployer');
-
 const REGISTRY_ADDR = '0xD6049E1F5F3EfF1F921f5532aF1A1632bA23929C';
 
 const nullAddress = '0x0000000000000000000000000000000000000000';
@@ -28,22 +26,6 @@ const getAddrFromRegistry = async (name) => {
     return addr;
 };
 
-const getProxyWithSigner = async (signer, addr) => {
-    const proxyRegistry = await
-    hre.ethers.getContractAt('IProxyRegistry', '0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4');
-
-    let proxyAddr = await proxyRegistry.proxies(addr);
-
-    if (proxyAddr === nullAddress) {
-        await proxyRegistry.build(addr);
-        proxyAddr = await proxyRegistry.proxies(addr);
-    }
-
-    const dsProxy = await hre.ethers.getContractAt('IHZLProxy', proxyAddr, signer);
-
-    return dsProxy;
-};
-
 const getProxy = async (acc) => {
     const proxyRegistry = await
     hre.ethers.getContractAt('IProxyRegistry', '0x4678f0a6958e4D2Bc4F1BAF7Bc52E8F3564f3fE4');
@@ -61,9 +43,6 @@ const getProxy = async (acc) => {
 };
 
 const redeploy = async (name, regAddr = REGISTRY_ADDR) => {
-    if (regAddr === REGISTRY_ADDR) {
-        await impersonateAccount(OWNER_ACC);
-    }
 
     const signer = await hre.ethers.provider.getSigner(OWNER_ACC);
 
@@ -88,10 +67,20 @@ const redeploy = async (name, regAddr = REGISTRY_ADDR) => {
     return c;
 };
 
-const send = async (tokenAddr, to, amount) => {
-    const tokenContract = await hre.ethers.getContractAt('IERC20', tokenAddr);
+const send = async (signer, tokenAddr, to, amount) => {
+    const value = hre.ethers.utils.parseUnits(amount, 18);
+    const IERC20 = await hre.ethers.getContractFactory('ERC20Token', signer);
+    const erc20 = await IERC20.attach(tokenAddr);
+    erc20.connect(signer);
+    await erc20.transfer(to, value);
+};
 
-    await tokenContract.transfer(to, amount);
+const mint = async (signer, tokenAddr, to, amount) => {
+    const value = hre.ethers.utils.parseUnits(amount, 18);
+    const IERC20 = await hre.ethers.getContractFactory('ERC20Token', signer);
+    const erc20 = await IERC20.attach(tokenAddr);
+    erc20.connect(signer);
+    await erc20.mint(value, to);
 };
 
 const approve = async (tokenAddr, to) => {
@@ -104,6 +93,7 @@ const approve = async (tokenAddr, to) => {
     }
 };
 
+
 const sendEther = async (signer, to, amount) => {
     const value = hre.ethers.utils.parseUnits(amount, 18);
     const txObj = await signer.populateTransaction({ to, value, gasLimit: 300000 });
@@ -114,15 +104,9 @@ const sendEther = async (signer, to, amount) => {
 const balanceOf = async (tokenAddr, addr) => {
     const tokenContract = await hre.ethers.getContractAt('IERC20', tokenAddr);
 
-    let balance = '';
-
-    if (tokenAddr.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
-        balance = await hre.ethers.provider.getBalance(addr);
-    } else {
-        balance = await tokenContract.balanceOf(addr);
-    }
-
-    return balance;
+    let balance = await tokenContract.balanceOf(addr);
+    const value = hre.ethers.utils.formatUnits(balance.toString(), 18);
+    return value;
 };
 
 const formatExchangeObj = (srcAddr, destAddr, amount, wrapper, destAmount = 0, uniV3fee) => {
@@ -179,21 +163,6 @@ const convertToWeth = (tokenAddr) => {
     return tokenAddr;
 };
 
-const setNewExchangeWrapper = async (acc, newAddr) => {
-    const exchangeOwnerAddr = '0xBc841B0dE0b93205e912CFBBd1D0c160A1ec6F00';
-    await sendEther(acc, exchangeOwnerAddr, '1');
-    await impersonateAccount(exchangeOwnerAddr);
-
-    const signer = await hre.ethers.provider.getSigner(exchangeOwnerAddr);
-
-    const registryInstance = await hre.ethers.getContractFactory('SaverExchangeRegistry');
-    const registry = await registryInstance.attach('0x25dd3F51e0C3c3Ff164DDC02A8E4D65Bb9cBB12D');
-    const registryByOwner = registry.connect(signer);
-
-    await registryByOwner.addWrapper(newAddr, { gasLimit: 300000 });
-    await stopImpersonatingAccount(exchangeOwnerAddr);
-};
-
 const depositToWeth = async (amount) => {
     const weth = await hre.ethers.getContractAt('IWETH', WETH_ADDRESS);
 
@@ -215,47 +184,17 @@ const Float2BN = (string, decimals) => hre.ethers.utils.parseUnits(string, decim
 module.exports = {
     getAddrFromRegistry,
     getProxy,
-    getProxyWithSigner,
-    redeploy,
     send,
+    mint,
     approve,
     balanceOf,
     formatExchangeObj,
     isEth,
     sendEther,
-    impersonateAccount,
-    stopImpersonatingAccount,
     convertToWeth,
     depositToWeth,
     timeTravel,
-    fetchStandardAmounts,
-    setNewExchangeWrapper,
-    fetchAmountinUSDPrice,
-    standardAmounts,
     nullAddress,
-    dydxTokens,
-    REGISTRY_ADDR,
-    AAVE_MARKET,
-    DAI_ADDR,
-    KYBER_WRAPPER,
-    UNISWAP_WRAPPER,
-    OASIS_WRAPPER,
-    WETH_ADDRESS,
-    ETH_ADDR,
-    OWNER_ACC,
-    ADMIN_ACC,
-    USDC_ADDR,
-    AAVE_FL_FEE,
-    MIN_VAULT_DAI_AMOUNT,
-    MIN_VAULT_RAI_AMOUNT,
-    RAI_ADDR,
-    MAX_UINT,
-    MAX_UINT128,
-    LOGGER_ADDR,
-    UNIV3ROUTER_ADDR,
-    UNIV3POSITIONMANAGER_ADDR,
     BN2Float,
     Float2BN,
-    YEARN_REGISTRY_ADDRESS,
-    STETH_ADDRESS,
 };

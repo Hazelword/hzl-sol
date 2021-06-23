@@ -3,6 +3,7 @@
 //
 // When running the script with `hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
+require('dotenv').config()
 const hre = require("hardhat");
 const ethers = hre.ethers;
 
@@ -15,23 +16,32 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const HzlToken = await hre.ethers.getContractFactory("HzlToken");
-  const ERC20Token = await hre.ethers.getContractFactory("ERC20Token");
+  const HzlConfig = await hre.ethers.getContractFactory("HZLConfig");
+  const HZLRegistry = await hre.ethers.getContractFactory("HZLRegistry");
 
-  const hzl = await HzlToken.deploy();
-  const btc = await ERC20Token.deploy("bitcoin", "btc");
-  const eth = await ERC20Token.deploy("ethereum", "eth");
-  const usdt = await ERC20Token.deploy("usdt erc20", "usdt");
 
-  await hzl.deployed();
-  await btc.deployed();
-  await eth.deployed();
-  await usdt.deployed();
+  const config = await HzlConfig.deploy();
+  const registry = await HZLRegistry.deploy();
 
-  console.log("hzl deployed to:", hzl.address);
-  console.log("btc deployed to:", btc.address);
-  console.log("eth deployed to:", eth.address);
-  console.log("usdt deployed to:", usdt.address);
+
+  await config.deployed();
+  await registry.deployed();
+
+  console.log('config deployed:', config.address);
+  console.log('registry deployed:', registry.address);
+
+  const btc = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('btc'));
+  const eth = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('eth'));
+  console.log('btc', btc);
+  console.log('eth', eth);
+  
+  //register
+  await registry.addNewContract(btc, process.env.BTC_ADDR);
+  await registry.addNewContract(eth, process.env.ETH_ADDR);
+
+  //config
+  await config.initConfig();
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere

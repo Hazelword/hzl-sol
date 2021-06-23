@@ -41,9 +41,9 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
         blockInfo.HZL_GENESIS_BLOCK = block.number;
     }
 
-    address public constant HZL_CONFIG_ADDR = 0xCCf3d848e08b94478Ed8f46fFead3008faF581fD;
+    address public constant HZL_CONFIG_ADDR = 0x78D714e1b47Bb86FE15788B917C9CC7B77975529;
 
-    address public constant HZL_REGISTRY_ADDR = 0xCCf3d848e08b94478Ed8f46fFead3008faF581fD;
+    address public constant HZL_REGISTRY_ADDR = 0x85b108660f47caDfAB9e0503104C08C1c96e0DA9;
 
 
     HZLConfig hzlConfig = HZLConfig(HZL_CONFIG_ADDR);
@@ -58,15 +58,14 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
 
     /// @notice Post a price for TOKEN/USDT
     /// @dev TOKEN is ERC20
-    /// @param id The address of TOKEN contract
+    /// @param tokenAddress The address of TOKEN contract
     /// @param num The numbers of TOKEN to quote
     /// @param usdtNum The price of TOKEN
-    function quote(bytes32 id, uint num, uint usdtNum) public onlyMiners payable {
+    function quote(address tokenAddress, uint num, uint usdtNum) public onlyMiners payable {
         
-        require(hzlRegisty.isRegistered(id), "not support is token address");
+        require(hzlRegisty.isRegistered(tokenAddress), "not support is token address");
         require(num > 0 && usdtNum >0, "num must greater than 0");
 
-        address tokenAddress = hzlRegisty.getAddr(id);
         PriceMarket storage market = _priceChain[blockInfo.HZL_CURRENT_BLOCK];
         PriceSheet[] storage priceSheets = market._priceSheets[tokenAddress];
 
@@ -159,10 +158,10 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
     
     /// @notice need invoke by onlyGovernance
     /// @dev query currently price
-    /// @param id The address of TOKEN contract
-    function queryCurrent(bytes32 id) public view onlyGovernances returns (uint256) {
-        require(hzlRegisty.isRegistered(id), "not support is token address");
-        address tokenAddress = hzlRegisty.getAddr(id);
+    /// @param tokenAddress The address of TOKEN contract
+    function queryCurrent(address tokenAddress) public view onlyGovernances returns (uint256) {
+        require(hzlRegisty.isRegistered(tokenAddress), "not support is token address");
+
         uint256 blockNumber = blockInfo.HZL_CURRENT_BLOCK;
         HzlBlock storage hzlblock = _hzlChain[blockNumber];
         
@@ -171,10 +170,9 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
 
     /// @notice close one order
     /// @dev Id is keccak256 of the contract name
-    /// @param id The address of TOKEN contract
+    /// @param tokenAddress The address of TOKEN contract
     /// @param index The numbers of TOKEN to quote
-    function closeOrder(bytes32 id, uint index) public override onlyMiners lock {
-        address tokenAddress = hzlRegisty.getAddr(id);
+    function closeOrder(address tokenAddress, uint index) public override onlyMiners lock {
         PriceMarket storage market = _priceChain[blockInfo.HZL_CURRENT_BLOCK];
         PriceSheet storage priceSheet = market._priceSheets[tokenAddress][index];
         require(priceSheet.minner == msg.sender, "user not the Order miners!");
@@ -185,8 +183,7 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
 
     /// @notice close all order byself
     /// @dev closed order will not cal
-    function closeAllOrder(bytes32 id) public override onlyMiners lock {
-        address tokenAddress = hzlRegisty.getAddr(id);
+    function closeAllOrder(address tokenAddress) public override onlyMiners lock {
         PriceMarket storage market = _priceChain[blockInfo.HZL_CURRENT_BLOCK];
         PriceSheet[] storage priceSheets = market._priceSheets[tokenAddress];
         for(uint j = 0; j < priceSheets.length; j++) {
@@ -198,8 +195,7 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
         emit CloseOrder(msg.sender, tokenAddress, uint(9999));
     }
 
-    function takeOrderToken(bytes32 id, uint256 index, uint256 num) public override onlyMiners lock {
-        address tokenAddress = hzlRegisty.getAddr(id);
+    function takeOrderToken(address tokenAddress, uint256 index, uint256 num) public override onlyMiners lock {
         PriceMarket storage market = _priceChain[blockInfo.HZL_CURRENT_BLOCK];
         PriceSheet[] storage priceSheets = market._priceSheets[tokenAddress];
         require(index < priceSheets.length, "HZL: TRADE_FAILED_OUTINDEX");
@@ -223,8 +219,7 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
         emit TakeOrder(msg.sender, tokenAddress, index, num);
     }
 
-    function takeOrderUstd(bytes32 id, uint256 index, uint256 num) public override onlyMiners lock {
-        address tokenAddress = hzlRegisty.getAddr(id);
+    function takeOrderUstd(address tokenAddress, uint256 index, uint256 num) public override onlyMiners lock {
         PriceMarket storage market = _priceChain[blockInfo.HZL_CURRENT_BLOCK];
         PriceSheet[] storage priceSheets = market._priceSheets[tokenAddress];
         require(index < priceSheets.length, "HZL: TRADE_FAILED_OUTINDEX");
