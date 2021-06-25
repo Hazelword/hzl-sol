@@ -3,6 +3,7 @@
 //
 // When running the script with `hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
+require('dotenv').config()
 const hre = require("hardhat");
 const ethers = hre.ethers;
 
@@ -23,6 +24,9 @@ async function main() {
   await mining.deployed();
 
   console.log("HzlMining deployed to:", mining.address);
+  
+  await mining.updateConfig(process.env.CONFIG_ADDR);
+  await mining.updateRegistry(process.env.REGISTRY_ADDR);
 
 }
 

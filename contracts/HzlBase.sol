@@ -77,4 +77,8 @@ contract HzlBase {
 
     BlockInfo blockInfo;
 
+    function getBlockInfo() public view returns(uint256, uint256, uint256) {
+        return (blockInfo.HZL_CURRENT_BLOCK, blockInfo.HZL_GENESIS_BLOCK, blockInfo.LAST_CHAIN_BLOCK);
+    }
+
 }

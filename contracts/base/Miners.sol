@@ -21,4 +21,8 @@ contract Miners {
         );
         _;
     }
+
+    function isMiners(address _add) public view returns(bool){
+        return minners[_add];
+    }
 }

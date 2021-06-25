@@ -19,7 +19,7 @@ abstract contract IHZLConfig {
     function getMinnerReward() public view virtual returns (uint256);
 
     /// @notice the block mining time of base chain block number
-    function getMiningRange() public view virtual returns (uint256);
+    function getMiningRange() public view virtual returns (uint32);
 
     /////////////////////////// OWNER ONLY FUNCTIONS ///////////////////////////
 

@@ -38,6 +38,7 @@ async function main() {
   //register
   await registry.addNewContract(btc, process.env.BTC_ADDR);
   await registry.addNewContract(eth, process.env.ETH_ADDR);
+  
 
   //config
   await config.initConfig();

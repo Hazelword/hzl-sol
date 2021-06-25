@@ -37,22 +37,22 @@ contract HZLConfig is AdminAuth, IHZLConfig {
 
     /// @notice Given the pledge hzl token for staking
     function getPledgeUnit() public view override returns (uint256){
-        return _miningConfig.pledgeUnit;
+        return _miningConfig.pledgeUnit * 1 ether;
     }
 
     /// @notice Given the fee for mining
     function getFeeUnit() public view override returns (uint256){
-        return _miningConfig.pledgeUnit;
+        return _miningConfig.feeUnit * 1 ether;
     }
 
     /// @notice Given the reward by per block
     function getMinnerReward() public view override returns (uint256){
-        return _miningConfig.pledgeUnit;
+        return _miningConfig.minnerReward * 1 ether;
     }
 
     /// @notice the block mining time of base chain block number
-    function getMiningRange() public view override returns (uint256){
-        return _miningConfig.pledgeUnit;
+    function getMiningRange() public view override returns (uint32){
+        return _miningConfig.miningRange;
     }
 
     /////////////////////////// OWNER ONLY FUNCTIONS ///////////////////////////
@@ -69,7 +69,7 @@ contract HZLConfig is AdminAuth, IHZLConfig {
 
     /// @notice init config
     function initConfig() public override {
-        _miningConfig = MiningConfig(20000, 10, 100, 15);
+        _miningConfig = MiningConfig(10000 * 1 ether, 10 * 1 ether, 100 * 1 ether, 15);
     }
 
     /// @notice update config
@@ -83,7 +83,7 @@ contract HZLConfig is AdminAuth, IHZLConfig {
         uint256 _minnerReward,
         uint32 _miningRange
     ) public override {
-        _miningConfig = MiningConfig(_pledgeUnit, _feeUnit, _minnerReward, _miningRange);
+        _miningConfig = MiningConfig(_pledgeUnit * 1 ether, _feeUnit * 1 ether, _minnerReward * 1 ether, _miningRange);
     }
 
 }
