@@ -20,21 +20,50 @@ describe("HzlMining", function() {
   const USDT_ADDR = process.env.USDT_ADDR;
 
   let accounts;
-  let amount = "10000";
+  let amount = "1000000";
 
   before(async function() {
     accounts = await web3.eth.getAccounts();
   });
 
   describe("init", function() {
+    it("transfer acc1", async function() {
+      await send(signer, HZL_ADDR, accounts[0], amount);
+      await send(signer, BTC_ADDR, accounts[0], amount);
+      await send(signer, ETH_ADDR, accounts[0], amount);
+      await send(signer, USDT_ADDR, accounts[0], amount);
+    });
+
+    it("transfer acc2", async function() {
+      await send(signer, HZL_ADDR, accounts[1], amount);
+      await send(signer, BTC_ADDR, accounts[1], amount);
+      await send(signer, ETH_ADDR, accounts[1], amount);
+      await send(signer, USDT_ADDR, accounts[1], amount);
+    });
+
+    it("transfer acc3", async function() {
+      await send(signer, HZL_ADDR, accounts[2], amount);
+      await send(signer, BTC_ADDR, accounts[2], amount);
+      await send(signer, ETH_ADDR, accounts[2], amount);
+      await send(signer, USDT_ADDR, accounts[2], amount);
+    });
+
+    it("transfer acc4", async function() {
+      await send(signer, HZL_ADDR, accounts[3], amount);
+      await send(signer, BTC_ADDR, accounts[3], amount);
+      await send(signer, ETH_ADDR, accounts[3], amount);
+      await send(signer, USDT_ADDR, accounts[3], amount);
+    });
+
+    it("transfer acc5", async function() {
+      await send(signer, HZL_ADDR, accounts[4], amount);
+      await send(signer, BTC_ADDR, accounts[4], amount);
+      await send(signer, ETH_ADDR, accounts[4], amount);
+      await send(signer, USDT_ADDR, accounts[4], amount);
+    });
+
     it("transfer 10000", async function() {
       console.log("=========1===========")
-      for(let account of accounts) {
-        await send(signer, HZL_ADDR, account, amount);
-        await send(signer, BTC_ADDR, account, amount);
-        await send(signer, ETH_ADDR, account, amount);
-        await send(signer, USDT_ADDR, account, amount);
-      }
       console.log("========2============")
       for(let account of accounts) {
         let hzl_banlance = await balanceOf(HZL_ADDR, account);

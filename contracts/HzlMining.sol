@@ -41,9 +41,9 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
         blockInfo.HZL_GENESIS_BLOCK = block.number;
     }
 
-    address public HZL_CONFIG_ADDR = 0xeaC6894fA6219bBe584e62D32f1E383c17D180F3;
+    address public constant HZL_CONFIG_ADDR = 0x78D714e1b47Bb86FE15788B917C9CC7B77975529;
 
-    address public HZL_REGISTRY_ADDR = 0x14cc7DA676d0ab469cfE4094d9e9AfdE1aFFc3FA;
+    address public constant HZL_REGISTRY_ADDR = 0x85b108660f47caDfAB9e0503104C08C1c96e0DA9;
 
 
     HZLConfig hzlConfig = HZLConfig(HZL_CONFIG_ADDR);
@@ -55,12 +55,20 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
         init = true;
     }
 
-    function updateConfig(address _config) external onlyGovernances {
-        HZL_CONFIG_ADDR = _config;
+    function updateConfig(address config) external onlyGovernances {
+        hzlConfig = HZLConfig(config);
     }
 
-    function updateRegistry(address _registry) external onlyGovernances {
-        HZL_REGISTRY_ADDR = _registry;
+    function getConfig() external view returns(address) {
+        return address(hzlConfig);
+    }
+
+    function updateRegistry(address registry) external onlyGovernances {
+        hzlRegisty = HZLRegistry(registry);
+    }
+
+    function getRegistry() external view returns(address) {
+        return address(hzlRegisty);
     }
 
 
@@ -254,7 +262,6 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
     /// @dev freeze some hzl
     function freeze() public override onlyNotMiners {
         ERC20 hzl =  ERC20(hzlRegisty.getAddr(HZL_TOKEN));
-        require(hzl.balanceOf(msg.sender) > hzlConfig.getPledgeUnit(), "pledge not enough!");
         hzl.safeTransferFrom(msg.sender, address(this), hzlConfig.getPledgeUnit());
         minners[msg.sender] = true;
         emit Freeze(msg.sender, hzlConfig.getPledgeUnit());

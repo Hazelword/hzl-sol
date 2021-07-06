@@ -1,5 +1,6 @@
 const hre = require('hardhat');
 const fs = require('fs');
+const BN = require("bn.js");
 
 const REGISTRY_ADDR = '0xD6049E1F5F3EfF1F921f5532aF1A1632bA23929C';
 
@@ -83,14 +84,10 @@ const mint = async (signer, tokenAddr, to, amount) => {
     await erc20.mint(value, to);
 };
 
-const approve = async (tokenAddr, to) => {
+const approve = async (signer, to, amount, tokenAddr) => {
     const tokenContract = await hre.ethers.getContractAt('IERC20', tokenAddr);
-
-    const allowance = await tokenContract.allowance(tokenContract.signer.address, to);
-
-    if (allowance.toString() === '0') {
-        await tokenContract.approve(to, hre.ethers.constants.MaxUint256, { gasLimit: 1000000 });
-    }
+    await tokenContract.connect(ethers.provider.getSigner(signer));
+    await tokenContract.approve(to, amount);
 };
 
 
@@ -181,6 +178,27 @@ const BN2Float = (bn, decimals) => hre.ethers.utils.formatUnits(bn, decimals);
 
 const Float2BN = (string, decimals) => hre.ethers.utils.parseUnits(string, decimals);
 
+const HZLMining = async (account) => {
+    const HzlMining = await hre.ethers.getContractFactory('HzlMining');
+    const hzlMining = await HzlMining.attach(process.env.MINING_ADDR);
+    hzlMining.connect(ethers.provider.getSigner(account));
+    return hzlMining;
+};
+
+const HZLConfig = async (account) => {
+    const HZLConfig = await hre.ethers.getContractFactory('HZLConfig');
+    const hzlConfig = await HZLConfig.attach(process.env.CONFIG_ADDR);
+    hzlConfig.connect(ethers.provider.getSigner(account));
+    return hzlConfig;
+};
+
+const HZLRegistry = async (account) => {
+    const HZLRegistry = await hre.ethers.getContractFactory('HZLRegistry');
+    const hzlRegistry = await HZLRegistry.attach(process.env.REGISTRY_ADDR);
+    hzlRegistry.connect(ethers.provider.getSigner(account));
+    return hzlRegistry;
+};
+
 module.exports = {
     getAddrFromRegistry,
     getProxy,
@@ -197,4 +215,11 @@ module.exports = {
     nullAddress,
     BN2Float,
     Float2BN,
+    USDT: function(value) { return new BN('1000000000000000000').mul(new BN(value * 1000000)).div(new BN('1000000')); },
+    HBTC: function(value) { return new BN('1000000000000000000').mul(new BN(value * 1000000)).div(new BN('1000000')); },
+    HETH: function(value) { return new BN('1000000000000000000').mul(new BN(value * 1000000)).div(new BN('1000000')); },
+    HZL: function(value) { return new BN('1000000000000000000').mul(new BN(value * 1000000)).div(new BN('1000000')); },
+    HZLMining,
+    HZLConfig,
+    HZLRegistry,
 };

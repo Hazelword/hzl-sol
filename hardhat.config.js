@@ -24,7 +24,7 @@ module.exports = {
       }
     },
     dev: {
-      url: 'http://127.0.0.1:9933',
+      url: 'http://8.210.116.104:9933',
       chainId: 1281,
       accounts: [process.env.PRI1, process.env.PRI2, process.env.PRI3, process.env.PRI4, process.env.PRI5, process.env.PRI6]
     }

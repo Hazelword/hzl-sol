@@ -9,7 +9,7 @@ import "./AdminVault.sol";
 contract AdminAuth {
     using SafeERC20 for IERC20;
 
-    address public constant ADMIN_VAULT_ADDR = 0x493275370aF3f63d9ccd10a6539435121cF4fbb9;
+    address public constant ADMIN_VAULT_ADDR = 0x7d4567B7257cf869B01a47E8cf0EDB3814bDb963;
 
     AdminVault public constant adminVault = AdminVault(ADMIN_VAULT_ADDR);
 

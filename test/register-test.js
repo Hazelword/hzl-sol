@@ -61,5 +61,15 @@ describe("IHZLRegistry", function() {
       console.log("addr_hzl:", hzl, addr_hzl);
       console.log("addr_usdt:", usdt, addr_usdt);
     });
+
+    it("HzlMining register", async function() {
+      const HzlMining = await hre.ethers.getContractFactory('HzlMining', signer);
+      const hzl = await HzlMining.attach(process.env.MINING_ADDR);
+      hzl.connect(signer);
+
+      await hzl.updateConfig(process.env.MINING_ADDR);
+      await hzl.updateRegistry(process.env.REGISTRY_ADDR);
+
+    });
   });
 });

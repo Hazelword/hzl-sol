@@ -37,17 +37,17 @@ contract HZLConfig is AdminAuth, IHZLConfig {
 
     /// @notice Given the pledge hzl token for staking
     function getPledgeUnit() public view override returns (uint256){
-        return _miningConfig.pledgeUnit * 1 ether;
+        return _miningConfig.pledgeUnit;
     }
 
     /// @notice Given the fee for mining
     function getFeeUnit() public view override returns (uint256){
-        return _miningConfig.feeUnit * 1 ether;
+        return _miningConfig.feeUnit;
     }
 
     /// @notice Given the reward by per block
     function getMinnerReward() public view override returns (uint256){
-        return _miningConfig.minnerReward * 1 ether;
+        return _miningConfig.minnerReward;
     }
 
     /// @notice the block mining time of base chain block number
