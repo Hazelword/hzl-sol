@@ -85,9 +85,13 @@ const mint = async (signer, tokenAddr, to, amount) => {
 };
 
 const approve = async (signer, to, amount, tokenAddr) => {
-    const tokenContract = await hre.ethers.getContractAt('IERC20', tokenAddr);
-    await tokenContract.connect(ethers.provider.getSigner(signer));
+    const tokenContract = await hre.ethers.getContractAt('IERC20', tokenAddr, ethers.provider.getSigner(signer));
     await tokenContract.approve(to, amount);
+};
+
+const freeze = async (signer) => {
+    const hzl = await hre.ethers.getContractAt('HzlMining', process.env.MINING_ADDR, ethers.provider.getSigner(signer));
+    await hzl.freeze();
 };
 
 
@@ -205,6 +209,7 @@ module.exports = {
     send,
     mint,
     approve,
+    freeze,
     balanceOf,
     formatExchangeObj,
     isEth,

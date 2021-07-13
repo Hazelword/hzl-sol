@@ -3,21 +3,19 @@ const { expect } = require('chai');
 const hre = require('hardhat');
 const ethers = hre.ethers;
 
-
-const HzlToken = artifacts.require("HzlToken");
-const ERC20Token = artifacts.require("ERC20Token");
-
 const { balanceOf } = require('./utils/common');
 
 describe("IHZLRegistry", function() {
 
-  const OWNER_ACC = process.env.ADDRESS1;
-  const signer = ethers.provider.getSigner(OWNER_ACC);
+  let OWNER_ACC;
+  let signer;
 
   let accounts;
 
   before(async function() {
     accounts = await web3.eth.getAccounts();
+    OWNER_ACC = accounts[0];
+    signer = ethers.provider.getSigner(OWNER_ACC)
   });
 
   describe("config", function() {

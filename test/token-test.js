@@ -11,8 +11,8 @@ const { balanceOf, send } = require('./utils/common');
 
 describe("HzlMining", function() {
 
-  const OWNER_ACC = process.env.ADDRESS1;
-  const signer = ethers.provider.getSigner(OWNER_ACC);
+  let OWNER_ACC;
+  let signer;
 
   const HZL_ADDR = process.env.HZL_ADDR;
   const BTC_ADDR = process.env.BTC_ADDR;
@@ -24,42 +24,20 @@ describe("HzlMining", function() {
 
   before(async function() {
     accounts = await web3.eth.getAccounts();
+    console.log(accounts)
+    OWNER_ACC = accounts[0];
+    signer = ethers.provider.getSigner(OWNER_ACC)
   });
 
   describe("init", function() {
-    it("transfer acc1", async function() {
-      await send(signer, HZL_ADDR, accounts[0], amount);
-      await send(signer, BTC_ADDR, accounts[0], amount);
-      await send(signer, ETH_ADDR, accounts[0], amount);
-      await send(signer, USDT_ADDR, accounts[0], amount);
-    });
-
-    it("transfer acc2", async function() {
-      await send(signer, HZL_ADDR, accounts[1], amount);
-      await send(signer, BTC_ADDR, accounts[1], amount);
-      await send(signer, ETH_ADDR, accounts[1], amount);
-      await send(signer, USDT_ADDR, accounts[1], amount);
-    });
-
-    it("transfer acc3", async function() {
-      await send(signer, HZL_ADDR, accounts[2], amount);
-      await send(signer, BTC_ADDR, accounts[2], amount);
-      await send(signer, ETH_ADDR, accounts[2], amount);
-      await send(signer, USDT_ADDR, accounts[2], amount);
-    });
-
-    it("transfer acc4", async function() {
-      await send(signer, HZL_ADDR, accounts[3], amount);
-      await send(signer, BTC_ADDR, accounts[3], amount);
-      await send(signer, ETH_ADDR, accounts[3], amount);
-      await send(signer, USDT_ADDR, accounts[3], amount);
-    });
-
-    it("transfer acc5", async function() {
-      await send(signer, HZL_ADDR, accounts[4], amount);
-      await send(signer, BTC_ADDR, accounts[4], amount);
-      await send(signer, ETH_ADDR, accounts[4], amount);
-      await send(signer, USDT_ADDR, accounts[4], amount);
+    
+    it("transfer", async function() {
+      for(let account of accounts) {
+        await send(signer, HZL_ADDR, account, amount);
+        await send(signer, BTC_ADDR, account, amount);
+        await send(signer, ETH_ADDR, account, amount);
+        await send(signer, USDT_ADDR, account, amount);
+      }
     });
 
     it("transfer 10000", async function() {

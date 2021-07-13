@@ -9,8 +9,8 @@ contract AdminVault {
 
     constructor() {
         owner = msg.sender;
-        admin = 0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac;
-        governance = 0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac;
+        admin = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+        governance = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
     }
 
     /// @notice Admin is able to change owner

@@ -11,7 +11,7 @@ const { balanceOf, mint } = require('./utils/common');
 
 describe("mint", function() {
 
-  const OWNER_ACC = process.env.ADDRESS1;
+  let OWNER_ACC;
   const signer = ethers.provider.getSigner(OWNER_ACC);
 
   const HZL_ADDR = process.env.HZL_ADDR;
@@ -19,7 +19,7 @@ describe("mint", function() {
   const ETH_ADDR = process.env.ETH_ADDR;
   const USDT_ADDR = process.env.USDT_ADDR;
 
-  const amount = "10000000";
+  const amount = "10000000000000";
 
   let accounts;
   let hzl_amount;
@@ -28,7 +28,10 @@ describe("mint", function() {
   let usdt_balance;
 
   before(async function() {
-    accounts = await web3.eth.getAccounts();
+    accounts = await hre.ethers.getSigners();
+    OWNER_ACC = accounts[0].address;
+    console.log("OWNER_ACC", OWNER_ACC)
+    console.log("HZL_ADDR", HZL_ADDR)
     hzl_amount = await balanceOf(HZL_ADDR, OWNER_ACC);
     btc_balance = await balanceOf(BTC_ADDR, OWNER_ACC);
     eth_balance = await balanceOf(ETH_ADDR, OWNER_ACC);

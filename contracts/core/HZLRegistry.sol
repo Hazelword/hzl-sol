@@ -9,7 +9,7 @@ import "../interface/IHZLRegistry.sol";
 /// @title Stores all the important qu addresses and can be changed (timelock)
 contract HZLRegistry is AdminAuth, IHZLRegistry {
     HZLLogger public constant logger = HZLLogger(
-        0x3469E1DaC06611030AEce8209F07501E9A7aCC69
+        0x68B1D87F95878fE05B998F19b66F4baba5De1aed
     );
 
     string public constant ERR_ENTRY_ALREADY_EXISTS = "Entry id already exists";

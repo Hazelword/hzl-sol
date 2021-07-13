@@ -38,10 +38,11 @@ async function main() {
   //register
   await registry.addNewContract(btc, process.env.BTC_ADDR);
   await registry.addNewContract(eth, process.env.ETH_ADDR);
-  
+  console.log('***register***');
 
   //config
   await config.initConfig();
+  console.log('***config***');
 
 }
 

@@ -24,6 +24,9 @@ async function main() {
   await mining.deployed();
 
   console.log("HzlMining deployed to:", mining.address);
+
+  console.log("HzlMining updateConfig to:", process.env.CONFIG_ADDR);
+  console.log("HzlMining updateRegistry to:", process.env.REGISTRY_ADDR);
   
   await mining.updateConfig(process.env.CONFIG_ADDR);
   await mining.updateRegistry(process.env.REGISTRY_ADDR);
