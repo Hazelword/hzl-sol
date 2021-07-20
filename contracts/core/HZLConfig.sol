@@ -28,6 +28,9 @@ contract HZLConfig is AdminAuth, IHZLConfig {
 
     mapping(bytes32 => address) _contracts;
 
+    // the precision of price,(e.g 1000, means four decimal places)
+    mapping(address => uint32) _precisions;
+
     /// @notice Given an contract id returns the config address
     /// @dev Id is keccak256 of the contract name
     /// @param _name Id of contract
@@ -55,6 +58,10 @@ contract HZLConfig is AdminAuth, IHZLConfig {
         return _miningConfig.miningRange;
     }
 
+    function getPrecision(address _addr) public view override returns (uint32){
+        return _precisions[_addr];
+    }
+
     /////////////////////////// OWNER ONLY FUNCTIONS ///////////////////////////
 
     /// @notice Adds a new contract to the config
@@ -65,6 +72,16 @@ contract HZLConfig is AdminAuth, IHZLConfig {
         address _contractAddr
     ) public override {
         _contracts[_name] = _contractAddr;
+    }
+
+    /// @notice Add precisions
+    /// @param _addr Address of the contract
+    /// @param _precision the precision of price,(e.g 1000, means four decimal places)
+    function addPrecisions(
+        address _addr,
+        uint32 _precision
+    ) public override {
+        _precisions[_addr] = _precision;
     }
 
     /// @notice init config

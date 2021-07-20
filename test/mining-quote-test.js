@@ -35,16 +35,26 @@ describe("HzlMining", function() {
 
     it("print", async function() {
       const btc_price = await MINING_CONTRACT.queryCurrent(BTC_ADDR);
-      console.log("btc_price:", btc_price);
+      console.log("btc_price:", btc_price.toString());
     });
 
     it("quote", async function() {
-      const tx = await MINING_CONTRACT.quote(BTC_ADDR, 1, 30000);
-      console.log("success:", tx);
-      const trace = await hre.network.provider.send("debug_traceTransaction", [
-        '0x6709e10f921493f69425241e5580105b9d4dde880c10f9ca673e6c8662613c88'
-      ]);
-      console.log("trace:", trace);
+      await approve(accounts[0], process.env.MINING_ADDR, Float2BN('1',18), BTC_ADDR);
+      await approve(accounts[0], process.env.MINING_ADDR, Float2BN('50000',18), USDT_ADDR);
+      console.log("approve", accounts[0])
+      const tx = await MINING_CONTRACT.quote(BTC_ADDR, Float2BN('1',18), Float2BN('30000',18));
+      // for(let account of accounts) {
+      //   let isMiners = await MINING_CONTRACT.isMiners(account);
+      //   console.log("minner", account, isMiners)
+      //   if(!isMiners) {
+      //     await approve(account, process.env.MINING_ADDR, Float2BN('100000',18), HZL_ADDR);
+      //     console.log("approve", account)
+      //   }
+      // }
+    });
+
+    it("settlement", async function() {
+      const tx = await MINING_CONTRACT.settlement();
       // for(let account of accounts) {
       //   let isMiners = await MINING_CONTRACT.isMiners(account);
       //   console.log("minner", account, isMiners)

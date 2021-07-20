@@ -62,7 +62,7 @@ contract HzlBase {
     bytes32 HZL_CONFIG = keccak256('HZLConfig');
 
     //price sheet, token address => quote
-    mapping(address => PriceSheet[]) _priceSheets;
+    //mapping(address => PriceSheet[]) _priceSheets;
 
     //price chain, block number => price market
     mapping(uint256 => PriceMarket) _priceChain;

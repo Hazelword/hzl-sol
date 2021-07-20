@@ -21,6 +21,8 @@ abstract contract IHZLConfig {
     /// @notice the block mining time of base chain block number
     function getMiningRange() public view virtual returns (uint32);
 
+    function getPrecision(address _addr) public view virtual returns (uint32);
+
     /////////////////////////// OWNER ONLY FUNCTIONS ///////////////////////////
 
     /// @notice Adds a new contract to the config
@@ -29,6 +31,11 @@ abstract contract IHZLConfig {
     function addNewContract(
         bytes32 _name,
         address _contractAddr
+    ) public virtual;
+
+    function addPrecisions(
+        address _addr,
+        uint32 _precision
     ) public virtual;
 
     /// @notice init config

@@ -27,12 +27,17 @@ contract HZLRegistry is AdminAuth, IHZLRegistry {
     mapping(address => Entry) public entries;
     mapping(bytes32 => address) public currentAddresses;
     mapping(bytes32 => address) public previousAddresses;
+    address[] private _quotePairs;
 
     /// @notice Given an contract id returns the registered address
     /// @dev Id is keccak256 of the contract name
     /// @param _id Id of contract
     function getAddr(bytes32 _id) public override view returns (address) {
         return currentAddresses[_id];
+    }
+
+    function getQuotePairs() public override view returns (address[] memory) {
+        return _quotePairs;
     }
 
     /// @notice Helper function to easily query if id is registered
@@ -60,7 +65,7 @@ contract HZLRegistry is AdminAuth, IHZLRegistry {
         currentAddresses[_id] = _contractAddr;
         // Remember tha address so we can revert back to old addr if needed
         previousAddresses[_id] = _contractAddr;
-
+        _quotePairs.push(_contractAddr);
         logger.Log(
             address(this),
             msg.sender,
