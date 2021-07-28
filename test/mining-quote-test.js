@@ -24,6 +24,9 @@ describe("HzlMining", function() {
   let MINING_CONTRACT;
   let CONFIG_CONTRACT;
 
+  let quoteusdt = ['60000','25000','45000', '5000'];
+  let quotetoken = ['2','1','1.5', '0.1'];
+
 
   before(async function() {
     
@@ -31,39 +34,36 @@ describe("HzlMining", function() {
     MINING_CONTRACT = await HZLMining(accounts[0]);
   });
 
+  function sleep(delay) {
+    var start = (new Date()).getTime();
+    while ((new Date()).getTime() - start < delay) {
+        // 使用  continue 实现；
+        continue; 
+    }
+  }
+
+  const print = async function() {
+    const btc_price = await MINING_CONTRACT.queryCurrent(BTC_ADDR);
+    console.log("btc_price:", btc_price.toString());
+  }
+
   describe("quote", function() {
 
-    it("print", async function() {
-      const btc_price = await MINING_CONTRACT.queryCurrent(BTC_ADDR);
-      console.log("btc_price:", btc_price.toString());
-    });
-
     it("quote", async function() {
-      await approve(accounts[0], process.env.MINING_ADDR, Float2BN('1',18), BTC_ADDR);
-      await approve(accounts[0], process.env.MINING_ADDR, Float2BN('50000',18), USDT_ADDR);
-      console.log("approve", accounts[0])
-      const tx = await MINING_CONTRACT.quote(BTC_ADDR, Float2BN('1',18), Float2BN('30000',18));
-      // for(let account of accounts) {
-      //   let isMiners = await MINING_CONTRACT.isMiners(account);
-      //   console.log("minner", account, isMiners)
-      //   if(!isMiners) {
-      //     await approve(account, process.env.MINING_ADDR, Float2BN('100000',18), HZL_ADDR);
-      //     console.log("approve", account)
-      //   }
-      // }
+      
+      for(let i=0; i<quoteusdt.length; i++) {
+        await approve(accounts[0], process.env.MINING_ADDR, Float2BN(quotetoken[i],18), BTC_ADDR);
+        await approve(accounts[0], process.env.MINING_ADDR, Float2BN(quoteusdt[i],18), USDT_ADDR);
+        console.log("approve", accounts[0])
+        const tx = await MINING_CONTRACT.quote(BTC_ADDR, Float2BN(quotetoken[i],18), Float2BN(quoteusdt[i],18));
+      }
     });
 
-    it("settlement", async function() {
-      const tx = await MINING_CONTRACT.settlement();
-      // for(let account of accounts) {
-      //   let isMiners = await MINING_CONTRACT.isMiners(account);
-      //   console.log("minner", account, isMiners)
-      //   if(!isMiners) {
-      //     await approve(account, process.env.MINING_ADDR, Float2BN('100000',18), HZL_ADDR);
-      //     console.log("approve", account)
-      //   }
-      // }
-    });
+    // it("query", async function() {
+    //   await print();
+    //   await MINING_CONTRACT.settlement();
+    //   await print();
+    // });
 
 
   });

@@ -59,6 +59,7 @@ describe("HzlMining", function() {
           await approve(account, process.env.MINING_ADDR, Float2BN('100000',18), HZL_ADDR);
           console.log("approve", account)
         }
+        break;
       }
     });
 
@@ -71,7 +72,9 @@ describe("HzlMining", function() {
           await freeze(account);
           console.log("freeze", account)
         }
+        break;
       }
+      
     });
 
   });

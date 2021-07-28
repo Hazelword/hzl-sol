@@ -42,6 +42,7 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
 
     constructor() {
         blockInfo.HZL_GENESIS_BLOCK = block.number;
+        blockInfo.HZL_CURRENT_BLOCK = 1;
     }
 
     address public constant HZL_CONFIG_ADDR = 0x78D714e1b47Bb86FE15788B917C9CC7B77975529;
@@ -84,7 +85,7 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
         
         require(hzlRegisty.isRegistered(tokenAddress), "not support is token address");
         require(num > 0 && usdtNum >0, "num must greater than 0");
-
+        uint32 precision = hzlConfig.getPrecision(tokenAddress);
         ERC20 usdt_erc20 =  ERC20(hzlRegisty.getAddr(USDT_TOKEN));
         usdt_erc20.safeTransferFrom(msg.sender, address(this), usdtNum);
 
@@ -105,9 +106,8 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
         // }
 
         uint256 index = priceSheets.length;
-        uint32 precision = hzlConfig.getPrecision(tokenAddress);
-
-        uint256 price = usdtNum.div(num).mul(precision);
+        
+        uint256 price = usdtNum.mul(precision).div(num);
 
         console.log("index is %s,precision is %s ,price is %s  ", index, precision, price);
 
@@ -122,7 +122,7 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
             price: price,
             remainToken: num,
             remainUsdt: usdtNum,
-            calNum: num,
+            calNum: usdtNum,
             level: 0,
             precision: precision,
             effect: true
@@ -162,6 +162,7 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
             address tokenAddress = qutoPairs[i];
             console.log("settlement is %s", tokenAddress);
             PriceSheet[] storage priceSheets = market._priceSheets[tokenAddress];
+            uint32 precision = hzlConfig.getPrecision(tokenAddress);
             uint256 len = priceSheets.length;
             if(len == uint256(0)){
                 hzlblock._price[tokenAddress] = _hzlChain[blockNumber-1]._price[tokenAddress];
@@ -175,6 +176,10 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
                 PriceSheet storage ps = priceSheets[j];
                 if(ps.level == uint32(0)){
                     // origin quote will be calculated
+                    if(ps.remainToken < ps.token) {
+                        uint lost = ps.token.sub(ps.remainToken).mul(ps.price).div(uint(precision));
+                        ps.calNum = ps.usdt.sub(lost);
+                    }
                     allNum = allNum + ps.calNum;
                     allCount = allCount + 1;
                 }
@@ -185,16 +190,17 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
                 PriceSheet storage ps = priceSheets[j];
                 if(ps.level == uint32(0)){
                     // origin quote will be calculated
-                    uint256 one_price = ps.usdt.div(ps.token).mul(ps.usdt).div(ps.remainUsdt);
+                    uint256 one_price = ps.price.mul(ps.calNum).div(allNum);
+                    console.log("one_price is %s, calNum is %s", one_price, ps.calNum);
                     allPrice = allPrice + one_price;
                 }
                 
             }
             console.log("allPrice is %s, allNum is %s, allCount is %s", allPrice, allNum, allCount);
             //cal the price for this token
-            uint256 price = allPrice.div(allCount);
-            hzlblock._price[tokenAddress] = price;
-            console.log("allCount is %s,price is %s  ", allCount, price);
+            //uint256 price = allPrice.div(allNum);
+            hzlblock._price[tokenAddress] = allPrice;
+            console.log("allNum is %s,price is %s  ", allNum, allPrice);
         
             emit NewBlock(msg.sender, block.number, blockNumber);
         }
@@ -245,6 +251,47 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
         console.log("blockNumber is %s, price is %s", blockNumber, price);
         
         return price;
+    }
+
+    /// @notice query Current Market token address
+    function queryCurrentMarketToken() public view returns (address[] memory) {
+        uint256 blockNumber = blockInfo.HZL_CURRENT_BLOCK;
+        PriceMarket storage market = _priceChain[blockNumber];
+        
+        return market._quotePairs;
+    }
+
+    /// @notice query Current Market Order
+    function queryCurrentMarketOrder(address tokenAddress) public view returns (uint256) {
+
+        require(hzlRegisty.isRegistered(tokenAddress), "address not registered");
+        uint256 blockNumber = blockInfo.HZL_CURRENT_BLOCK;
+        PriceMarket storage market = _priceChain[blockNumber];
+        PriceSheet[] storage priceSheets = market._priceSheets[tokenAddress];
+
+        return priceSheets.length;
+    }
+
+    function queryCurrentMarketOrderIndex(address tokenAddress, uint index) 
+        public 
+        view 
+        returns (
+            uint256 indexKey,
+            uint256 token,
+            uint256 usdt,
+            uint256 price,
+            uint256 remainToken,
+            uint256 remainUsdt,
+            uint32 level,
+            uint32 precision
+        ) {
+
+        require(hzlRegisty.isRegistered(tokenAddress), "address not registered");
+        uint256 blockNumber = blockInfo.HZL_CURRENT_BLOCK;
+        PriceMarket storage market = _priceChain[blockNumber];
+        PriceSheet storage priceSheets = market._priceSheets[tokenAddress][index];
+
+        return (index, priceSheets.token, priceSheets.usdt, priceSheets.price, priceSheets.remainToken, priceSheets.remainUsdt, priceSheets.level, priceSheets.precision);
     }
 
     /// @notice close one order
@@ -338,4 +385,5 @@ contract HzlMining is HzlBase, AdminAuth, IHzlMining, Lock, Miners{
         hzl.safeTransfer(address(this), hzlConfig.getPledgeUnit());
         emit UnFreeze(msg.sender, hzlConfig.getPledgeUnit());
     }
+
 }
