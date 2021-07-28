@@ -31,6 +31,8 @@ async function main() {
   await mining.updateConfig(process.env.CONFIG_ADDR);
   await mining.updateRegistry(process.env.REGISTRY_ADDR);
 
+  await mining.updateRegistry(process.env.REGISTRY_ADDR);
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere
