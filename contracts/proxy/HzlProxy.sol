@@ -17,7 +17,7 @@ contract HzlProxy is UpgradeabilityProxy {
     event ProxyOwnershipTransferred(address previousOwner, address newOwner);
 
     // Storage position of the owner of the contract
-    bytes32 private constant proxyOwnerPosition = keccak256("shie.reins.proxy.owner");
+    bytes32 private constant proxyOwnerPosition = keccak256("hazel.org.owner");
 
     /**
      * @dev Throws if called by any account other than the owner.
